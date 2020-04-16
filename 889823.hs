@@ -4,8 +4,9 @@
 -- UP889823
 --
 import Data.Char
-import Data.Ratio
-
+import Data.List
+import Text.Printf
+import Text.PrettyPrint
 
 
 --
@@ -46,14 +47,24 @@ averageRainfall city ((location, float1, float2, int):place)
     where
         average = fromIntegral (sum int) / 7
 
+
+
+-- iii
+
+
+
+placesToString :: [Place] -> String
+placesToString ((location, float1, float2, x):place) =
+    location ++ "       " ++ show x ++ "\n \n" ++ placesToString place
+
 --
 --  Demo
 --
 
 demo :: Int -> IO ()
 demo 1  = print (displayNames testData) -- display the names of all the places
-demo 2 = print (averageRainfall "Cardiff" testData) -- display, to two decimal places, the average rainfall in Cardiff
--- demo 3 = putStrLn (placesToString testData)
+demo 2 = printf "%.2f\n" (averageRainfall "Cardiff" testData) -- display, to two decimal places, the average rainfall in Cardiff
+demo 3 = putStrLn (placesToString testData)
 -- demo 4 = -- display the names of all places that were dry two days ago
 -- demo 5 = -- update the data with most recent rainfall
 --          --[0,8,0,0,5,0,0,3,4,2,0,8,0,0] (and remove oldest rainfall figures)
