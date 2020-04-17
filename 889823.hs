@@ -36,8 +36,8 @@ testData = [("London"       ,(51.5),  (-0.1),   [0, 0, 5, 8, 8, 0, 0]),
 --
 
 -- i
-displayNames :: [Place] -> [String]
-displayNames x = [name | (name, float1, float2, int) <- x]
+displayLocations :: [Place] -> [String]
+displayLocations x = [name | (name, float1, float2, int) <- x]
 
 --ii
 averageRainfall :: String -> [Place] -> Float
@@ -49,23 +49,34 @@ averageRainfall city ((location, float1, float2, int):place)
 
 
 
--- iii
-
-
-
+-- iii -- NEED TO MAKE IT LOOK NEAT!
 placesToString :: [Place] -> String
-placesToString ((location, float1, float2, x):place) =
-    location ++ "       " ++ show x ++ "\n \n" ++ placesToString place
+placesToString [] = []
+placesToString ((location, float1, float2, rainfall):place) =
+    location ++ " | " ++ intercalate " | " (map show rainfall) ++ "\n \n" ++ placesToString place
+
+
+--  iv
+dryNames :: [Place] -> Int -> [String]
+dryNames ((location, float1, float2, rainfall):place) days
+    | place == [] = []
+    | rainfall !!noDays == 0 = location: dryNames place days
+    | otherwise = dryNames place days
+    where
+        noDays = days - 1
+
+
+
 
 --
 --  Demo
 --
 
 demo :: Int -> IO ()
-demo 1  = print (displayNames testData) -- display the names of all the places
+demo 1  = print (displayLocations testData) -- display the names of all the places
 demo 2 = printf "%.2f\n" (averageRainfall "Cardiff" testData) -- display, to two decimal places, the average rainfall in Cardiff
 demo 3 = putStrLn (placesToString testData)
--- demo 4 = -- display the names of all places that were dry two days ago
+demo 4 =  print (dryNames testData 2) -- display the names of all places that were dry two days ago
 -- demo 5 = -- update the data with most recent rainfall
 --          --[0,8,0,0,5,0,0,3,4,2,0,8,0,0] (and remove oldest rainfall figures)
 -- demo 6 = -- replace "Plymouth" with "Portsmouth" which has
