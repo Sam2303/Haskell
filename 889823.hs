@@ -6,7 +6,7 @@
 import Data.Char
 import Data.List
 import Text.Printf
-import Text.PrettyPrint
+
 
 
 --
@@ -66,6 +66,13 @@ dryNames ((location, float1, float2, rainfall):place) days
         noDays = days - 1
 
 
+-- v
+updateRainfall :: [Place] -> [Int] -> [Place]
+updateRainfall ((location, float1, float2, rainfall):place) newRain
+    | place == [] = []
+    | location == location = ((location, float1, float2, newRain):place)
+
+
 
 
 --
@@ -77,8 +84,10 @@ demo 1  = print (displayLocations testData) -- display the names of all the plac
 demo 2 = printf "%.2f\n" (averageRainfall "Cardiff" testData) -- display, to two decimal places, the average rainfall in Cardiff
 demo 3 = putStrLn (placesToString testData)
 demo 4 =  print (dryNames testData 2) -- display the names of all places that were dry two days ago
--- demo 5 = -- update the data with most recent rainfall
+demo 5 = print (updateRainfall testData [0,8,0,0,5,0,0,3,4,2,0,8,0,0])
+-- update the data with most recent rainfall
 --          --[0,8,0,0,5,0,0,3,4,2,0,8,0,0] (and remove oldest rainfall figures)
+
 -- demo 6 = -- replace "Plymouth" with "Portsmouth" which has
 --          -- location 50.8 (N), -1.1 (E) and rainfall 0, 0, 3, 2, 5, 2, 1
 -- demo 7 = -- display the name of the place closest to 50.9 (N), -1.3 (E)
