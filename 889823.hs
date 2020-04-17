@@ -70,7 +70,9 @@ dryNames ((location, float1, float2, rainfall):place) days
 updateRainfall :: [Place] -> [Int] -> [Place]
 updateRainfall ((location, float1, float2, rainfall):place) newRain
     | place == [] = []
-    | location == location = ((location, float1, float2, newRain):place)
+    | location == location = init rainfall && rainfall ++ 1
+    -- where
+    --     newRainNo = x updateRainfall place xs
 
 
 
