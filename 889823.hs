@@ -65,28 +65,26 @@ dryNames place days = [location | (location, float1, float2, rainfall) <- place,
 
 
 -- v
-
-
-
-
--- updateRainfall :: [Place] -> [Int] -> [Place]
--- updateRainfall  _ [] = []
--- updateRainfall ((location, float1, float2, rainfall):place) (x:xs)
---     | rainfall !!6 = updateRainfall place xs
+updateRainfall :: [Place] -> [Int] -> [Place]
+updateRainfall  _ [] = []
+updateRainfall ((location, float1, float2, rainfall):place) (x:xs) =
+    ((location, float1, float2, x: init rainfall):updateRainfall place xs)
 
 
 
 
 --vi
--- replaceData :: String ->[Place] -> Place -> [Place]
--- replaceData oldPlace ((location, float1, float2, rainfall):place)
---     ((newLocation, newFloat1, newFloat2, newRainfall):newPlace)
---         | newPlace == [] = []
---         | oldPlace ==  location = ((newLocation, newFloat1, newFloat2, newRainfall):place) replaceData oldPlace place newPlace
---         | otherwise = replaceData oldPlace place newPlace
+replaceData :: String -> Place -> [Place] -> [Place]
+replaceData old new [] = []
+replaceData old new ((location,float1,float2,rainfall):place)
+    | old == location = new : replaceData old new place
+    | otherwise   = (location,float1,float2,rainfall) : replaceData old new place
 
 
-
+--vii
+cloestDryPlace :: Float -> Float -> [Place] -> String
+cloestDryPlace degN degE ((location float1, float2, rainfall):place)
+    | 
 --
 --  Demo
 --
@@ -96,11 +94,10 @@ demo 1  = print (displayLocations testData) -- display the names of all the plac
 demo 2 = printf "%.2f\n" (averageRainfall "Cardiff" testData) -- display, to two decimal places, the average rainfall in Cardiff
 demo 3 = putStrLn (placesToString testData)
 demo 4 =  print (dryNames testData 2) -- display the names of all places that were dry two days ago
---demo 5 = print (updateRainfall testData [0,8,0,0,5,0,0,3,4,2,0,8,0,0])
--- update the data with most recent rainfall
---          --[0,8,0,0,5,0,0,3,4,2,0,8,0,0] (and remove oldest rainfall figures)
+demo 5 = print (updateRainfall testData [0,8,0,0,5,0,0,3,4,2,0,8,0,0]) -- update the data with most recent rainfall
+                                                                       --[0,8,0,0,5,0,0,3,4,2,0,8,0,0] (and remove oldest rainfall figures)
 
---demo 6 = print (replaceData "Plymouth" testData [("London")       ,(51.5),  (-0.1),   [0, 0, 5, 8, 8, 0, 0]] )
+demo 6 = print (replaceData "Plymouth" ("Portsmouth", 50.8, (-1.1), [0, 0, 3, 2, 5, 2, 1]) testData)
 -- replace "Plymouth" with "Portsmouth" which has
 --          -- location 50.8 (N), -1.1 (E) and rainfall 0, 0, 3, 2, 5, 2, 1
 
