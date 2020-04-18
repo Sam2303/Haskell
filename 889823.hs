@@ -59,6 +59,7 @@ placesToString ((location, float1, float2, rainfall):place) =
 
 
 
+
 --  iv
 dryNames :: [Place] -> Int -> [String]
 dryNames place days = [location | (location, float1, float2, rainfall) <- place, rainfall !!(days-1) == 0]
@@ -83,8 +84,8 @@ replaceData old new ((location,float1,float2,rainfall):place)
 
 --vii
 cloestDryPlace :: Float -> Float -> [Place] -> String
-cloestDryPlace degN degE ((location float1, float2, rainfall):place)
-    | 
+cloestDryPlace degN degE ((location, float1, float2, rainfall):place) = location
+
 --
 --  Demo
 --
@@ -102,7 +103,8 @@ demo 6 = print (replaceData "Plymouth" ("Portsmouth", 50.8, (-1.1), [0, 0, 3, 2,
 --          -- location 50.8 (N), -1.1 (E) and rainfall 0, 0, 3, 2, 5, 2, 1
 
 
--- demo 7 = -- display the name of the place closest to 50.9 (N), -1.3 (E)
+demo 7 = print (cloestDryPlace 50.9 (-1.3) testData)
+    -- display the name of the place closest to 50.9 (N), -1.3 (E)
 --          -- that was dry yesterday
 
 
