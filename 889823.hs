@@ -6,6 +6,8 @@
 import Data.Char
 import Data.List
 import Text.Printf
+import Data.Foldable (minimumBy)
+import Data.Ord (comparing)
 
 
 
@@ -49,14 +51,19 @@ averageRainfall city ((location, float1, float2, int):place)
 
 
 
--- iii -- NEED TO MAKE IT LOOK NEAT!
-placesToString :: [Place] -> String
-placesToString [] = []
-placesToString ((location, float1, float2, rainfall):place) =
-    location ++ take (15 - length location) (cycle " ") ++
-        intercalate " | "  (map show rainfall ) ++
-            "\n \n" ++ placesToString place
+-- iii
 
+rainfallPadding :: Int -> Char -> String -> String
+rainfallPadding number char string = replicate ( number - length string) char ++ string
+locationPadding :: Int -> Char -> String -> String
+locationPadding number char string = string ++ replicate ( number - length string) char
+
+placeToString :: Place -> String
+placeToString (location, _, _, rainfall) = locationPadding 10  ' ' location ++ intercalate " | " (map(rainfallPadding 3 ' ' . show)rainfall)
+
+
+placesToString :: [Place] -> String
+placesToString = concat . intersperse "\n" . map placeToString
 
 
 
@@ -83,8 +90,21 @@ replaceData old new ((location,float1,float2,rainfall):place)
 
 
 --vii
-cloestDryPlace :: Float -> Float -> [Place] -> String
-cloestDryPlace degN degE ((location, float1, float2, rainfall):place) = location
+dist2 :: Float -> Float -> Float -> Float -> Float
+dist2 x1 y1 x2 y2 = (x2-x1)^2 + (y2-y1)^2
+
+closestPlace :: Float -> Float -> [Place] -> Place
+closestPlace x y  = minimumBy (comparing (dist2P x y))
+
+dist2P :: Float -> Float -> Place -> Float
+dist2P x y (_, x', y', _) = dist2 x y x' y'
+
+placeName :: Place -> String
+placeName (s, _, _, _) = s
+
+closestPlaceName :: Float -> Float -> [Place] -> String
+closestPlaceName x y = placeName . closestPlace x y
+
 
 --
 --  Demo
@@ -97,16 +117,11 @@ demo 3 = putStrLn (placesToString testData)
 demo 4 =  print (dryNames testData 2) -- display the names of all places that were dry two days ago
 demo 5 = print (updateRainfall testData [0,8,0,0,5,0,0,3,4,2,0,8,0,0]) -- update the data with most recent rainfall
                                                                        --[0,8,0,0,5,0,0,3,4,2,0,8,0,0] (and remove oldest rainfall figures)
-
 demo 6 = print (replaceData "Plymouth" ("Portsmouth", 50.8, (-1.1), [0, 0, 3, 2, 5, 2, 1]) testData)
 -- replace "Plymouth" with "Portsmouth" which has
 --          -- location 50.8 (N), -1.1 (E) and rainfall 0, 0, 3, 2, 5, 2, 1
-
-
-demo 7 = print (cloestDryPlace 50.9 (-1.3) testData)
-    -- display the name of the place closest to 50.9 (N), -1.3 (E)
---          -- that was dry yesterday
-
+demo 7 = putStrLn (closestPlaceName (50.9)  (-1.3) testData)
+    -- display the name of the place closest to 50.9 (N), -1.3 (E) that was dry yesterday
 
 -- demo 8 = -- display the rainfall map
 
