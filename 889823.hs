@@ -6,8 +6,8 @@
 import Data.Char
 import Data.List
 import Text.Printf
-import Data.Foldable (minimumBy)
-import Data.Ord (comparing)
+import Data.Foldable
+import Data.Ord
 
 
 
@@ -69,7 +69,7 @@ placesToString = concat . intersperse "\n" . map placeToString
 
 --  iv
 dryNames :: [Place] -> Int -> [String]
-dryNames place days = [location | (location, float1, float2, rainfall) <- place, rainfall !!(days-1) == 0]
+dryNames place days = [location | (location, _, _, rainfall) <- place, rainfall !!(days-1) == 0]
 
 
 -- v
@@ -91,10 +91,14 @@ replaceData old new ((location,float1,float2,rainfall):place)
 
 --vii
 dist2 :: Float -> Float -> Float -> Float -> Float
-dist2 x1 y1 x2 y2 = (x2-x1)^2 + (y2-y1)^2
+dist2 x1 y1 x2 y2 = sqrt((x2-x1)^2 + (y2-y1)^2)
+
+dryYesterday :: Place -> Bool
+dryYesterday (_, _, _, r) = r !!0 == 0
 
 closestPlace :: Float -> Float -> [Place] -> Place
-closestPlace x y  = minimumBy (comparing (dist2P x y))
+closestPlace x y  = (minimumBy (comparing (dist2P x y))) . filter dryYesterday
+
 
 dist2P :: Float -> Float -> Place -> Float
 dist2P x y (_, x', y', _) = dist2 x y x' y'
@@ -103,7 +107,11 @@ placeName :: Place -> String
 placeName (s, _, _, _) = s
 
 closestPlaceName :: Float -> Float -> [Place] -> String
-closestPlaceName x y = placeName . closestPlace x y
+closestPlaceName x y  = placeName . closestPlace x y
+
+
+--viii --Rainfall Map
+
 
 
 --
