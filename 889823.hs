@@ -3,12 +3,13 @@
 --
 -- UP889823
 --
+
 import Data.Char
 import Data.List
 import Text.Printf
 import Data.Foldable
 import Data.Ord
-
+import Numeric
 
 
 --
@@ -39,7 +40,7 @@ testData = [("London"       ,(51.5),  (-0.1),   [0, 0, 5, 8, 8, 0, 0]),
 
 -- i
 displayLocations :: [Place] -> [String]
-displayLocations x = [name | (name, float1, float2, int) <- x]
+displayLocations x = [name | (name, _, _, _) <- x]
 
 --ii
 averageRainfall :: String -> [Place] -> Float
@@ -131,7 +132,11 @@ demo 6 = print (replaceData "Plymouth" ("Portsmouth", 50.8, (-1.1), [0, 0, 3, 2,
 demo 7 = putStrLn (closestPlaceName (50.9)  (-1.3) testData)
     -- display the name of the place closest to 50.9 (N), -1.3 (E) that was dry yesterday
 
--- demo 8 = -- display the rainfall map
+demo 8 = plotterCords testData
+
+
+
+
 
 
 --
@@ -159,7 +164,25 @@ writeAt position text = do
 --
 -- Your rainfall map code goes here
 --
+plotterCords :: [Place] -> IO()
+plotterCords ((location, degN, degE, rainfall):place) = do
+    clearScreen
+    plot ((location, degN, degE, rainfall):place)
+    goTo (0,50)
 
+plot :: [Place] -> IO()
+plot [] = return()
+plot ((location, degN, degE, rainfall):place) = do
+    writeAt (xAxis degE, yAxis degN)
+        ("+ " ++ location ++ " " ++ printf "%.2f" (avgRain rainfall))
+    plot place
+
+xAxis, yAxis :: Float -> Int
+xAxis x = round(((x + 6.6) / 0.1) -1)
+yAxis y = round(((y - 61.25) / (-0.25)) -1)
+
+avgRain :: [Int] -> Float
+avgRain int = fromIntegral (sum int) / 7
 
 
 --
