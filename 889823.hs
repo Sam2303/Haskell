@@ -12,6 +12,7 @@ import Data.Ord
 import Numeric
 
 
+
 --
 -- Types (define Place type here)
 
@@ -188,3 +189,96 @@ avgRain int = fromIntegral (sum int) / 7
 --
 -- Your user interface (and loading/saving) code goes here
 --
+
+menu = "\n \n Haskell Rain Menu \n \n 1 - Display Names of all the locations"++
+    "\n 2 - Find the average rainfall for a given place \n 3 - Display all locatins and their rainfall" ++
+    "\n 4 - Find all the dry locations a certain number of days ago \n 5 - Update the data" ++
+    "\n 6 - Replace a location with a new one \n 7 - Find the closest dry place yesterday when you pass in coordinates" ++
+    "\n 8 - Display a map of all the locations in the data \n 9 - Exit Program \n\n"
+
+
+main :: IO()
+main = do
+   clearScreen
+   content <- readFile("places.txt")
+   let dataFile :: [Place]
+       dataFile = read content
+   menuFunction (dataFile)
+   -- let finalData = show dataFile
+   -- writeFile ("places.txt") finalData
+
+menuFunction :: [Place] -> IO()
+menuFunction  place = do
+    putStrLn "\n\n"
+    print  (displayLocations place)
+    putStrLn menu
+    input <- getLine
+    outputsIO input place
+
+outputsIO :: String -> [Place] ->  IO()
+outputsIO inp place
+    | inp == "1" = do
+        print(displayLocations place)
+        menuFunction place
+    | inp == "2" = do
+        putStr "Please Enter the City: "
+        city <- getLine
+        printf "%.2f\n" (averageRainfall city place)
+        menuFunction place
+    | inp == "3" = do
+        putStrLn (placesToString place)
+        menuFunction place
+    | inp == "4" = do
+        putStr "How many days ago : "
+        days <- getLine
+        let day = read days
+        print (dryNames place day)
+        menuFunction place
+    | inp == "5" = do
+        putStr "Enter to new Data in order of the locations you see above: "
+        newData <- getLine
+        let dataString = "[" ++ newData ++"]"
+        let newDatas = read dataString
+        putStrLn "\n"
+        print(updateRainfall place newDatas)
+        menuFunction place
+    | inp == "6" = do
+        noSix place
+        menuFunction place
+    | inp == "7" = do
+        putStr "What is the degE: "
+        degE <- getLine
+        let degEF = read degE
+        putStr "What is the degN: "
+        degN <- getLine
+        let degNStr = "("++degN++")"
+        let degNF = read degNStr
+        putStrLn (closestPlaceName (degNF)  (degEF) place)
+        menuFunction place
+    | inp == "8" = do
+        plotterCords place
+        menuFunction place
+    | inp == "9" = do
+        putStrLn "You have exited"
+        return()
+    | otherwise = menuFunction place
+
+
+noSix :: [Place] -> IO()
+noSix place = do
+        putStr "What location would you like to replace: "
+        oldCity <- getLine
+        putStr "What is the new location: "
+        newCity <- getLine
+        putStr "What is the Degrees North: "
+        degN <- getLine
+        let degNF = read degN
+        putStr "What is the Degrees East: "
+        degE <- getLine
+        let degEStr = "("++ degE ++")"
+        let degEFloat = read degEStr
+        putStr "What is the ranifall for the last 7 days: "
+        newData <- getLine
+        let dataString = "[" ++ newData ++"]"
+        let newDatas = read dataString
+        print (replaceData oldCity (newCity, degNF, degEFloat, newDatas) place)
